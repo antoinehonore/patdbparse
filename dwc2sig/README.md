@@ -35,7 +35,7 @@ index out of bounds: the len is 0 but the index is 19
 ```
 It is likely because the patient map file was not decrypted. I haven't been able to find a good solution for `gpg` to work correctly inside the container with a private key requiring a passphrase.
 
-Some work around:
+Work arounds:
 - do not use the container and build the binary on your host directly (See the command in `singularity/thecontainer.def`)
 - (unsafe) decrypt the map file, and place it in the same folder as the encrypted one with filename (`PatientsMapping.txt`)
 
