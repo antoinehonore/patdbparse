@@ -1,0 +1,17 @@
+numpy>=1.17.2
+scikit-learn
+plotly
+scipy
+git+https://gitlab.com/antoinehonore/utils_db
+#git+https://gitlab.com/antoinehonore/utils_plots
+#git+https://gitlab.com/antoinehonore/utils_tbox
+git+https://gitlab.com/antoinehonore/utils_features
+matplotlib
+pandas>=0.25.1
+parse>=1.12.1
+python-dateutil>=2.8.0
+pytz>=2019.3
+six>=1.12.0
+Unidecode>=1.1.1
+xlrd>=1.2.0
+openpyxl
