@@ -1,0 +1,14 @@
+BootStrap: docker
+From: debian:12
+
+%post
+    apt-get update 
+    apt-get install -y git build-essential jq curl python3-tk python3-pip python3-virtualenv liblapack-dev libblas-dev
+    virtualenv -p python3 /opt/pyenv
+
+    /opt/pyenv/bin/pip install --no-cache-dir -r /opt/requirements.txt
+    
+    
+
+%files
+    ../requirements.txt /opt/requirements.txt
