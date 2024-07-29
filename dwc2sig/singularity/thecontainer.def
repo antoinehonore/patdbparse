@@ -1,0 +1,14 @@
+Bootstrap: docker
+From: debian:12
+
+%post
+    apt-get update 
+    apt-get install -y git curl gcc build-essential
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    $HOME/.cargo/bin/cargo build --release --manifest-path /opt/dwc2sig/Cargo.toml 
+    ln -s /opt/dwc2sig/target/release/patdb_bin /opt/dwc2sig/bin/dwc2sig
+
+%files
+    ../dwc2sig /opt/dwc2sig
+    /opt/psql/gpg_antoine_pfile.txt /opt/psql/gpg_antoine_pfile.txt
+
