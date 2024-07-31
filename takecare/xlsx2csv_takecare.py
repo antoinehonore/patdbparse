@@ -131,7 +131,7 @@ if __name__ == "__main__":
         patid_error = "|".join(["patientID", fname, "", "non unique patientid", "", "", "patientID"])
         print(patid_error, file=sys.stderr)
 
-    if patid.shape[0] == 1 and ( ((fname != (patid[0] + "_v2_takecare.xlsx")) and (fname != (patid[0] + "_takecare.xlsx"))) and (not ("covid" in fname))):
+    if patid.shape[0] == 1 and ((fname != (patid[0] + "_v2_takecare.xlsx")) and (fname != (patid[0] + "_takecare.xlsx")) and (not ("covid" in fname))):
         patid_error = "|".join(["patientID", fname, "", "patientID differs from file name","","","patientID"])
         print(patid_error, file=sys.stderr)
 
@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
 
     # Carefully parse/format dates in the datafile
-    tmp_date = pd.to_datetime(data["date"], infer_datetime_format=True,errors="coerce")
+    tmp_date = pd.to_datetime(data["date"], format="%Y-%m-%d %H:%M",errors="coerce")
     errors = data[tmp_date.isna()].copy()
 
     if errors.shape[0] > 0:
@@ -169,8 +169,6 @@ if __name__ == "__main__":
     # Write all errors to stderr
     if not errors.empty:
         errors[error_columns].to_csv(sys.stderr, sep="|", index=False, header=False)
-
-
 
     # Assign group
     nom_headers = list(nom)

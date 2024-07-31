@@ -32,29 +32,14 @@ class TestCase_format_ref(unittest.TestCase):
         dlist = self.initlists()
         self.assertEqual(format_ref("the type of microbe", lists=dlist), re.compile("^the (microb1|microb2)$"))
 
-    def test_3(self):
+    def test_4(self):
         dlist = self.initlists()
         self.assertEqual(format_ref("the [treatments]", lists=dlist), re.compile("^the (med1|med2)$"))
 
-    def test_4(self):
+    def test_5(self):
         dlist = self.initlists()
         self.assertEqual(format_ref("diagnosis, [malformations] thefdsfa",
                                     lists=dlist), re.compile("^diagnosis, (thefirst|thesecond) thefdsfa$"))
-
-def get_nomenclature_ref(fname):
-    # Read Nomenclature - Sheet 1
-    nom = pd.read_excel(fname)
-    nom.rename(columns=lambda x: format_str(x), inplace=True)
-    nom[['event', 'specificities']] = nom[['event', 'specificities']].fillna(method="ffill")
-    nom[['event', 'specificities', "notes"]] = to_lower(nom[['event', 'specificities', "notes"]])
-
-    # Read Nomenclature - Sheet 2
-    drop_down_lists = pd.read_excel(fname, sheet_name="Sheet2")
-    re_lists = format_drop_down_lists(drop_down_lists)
-    format_ref_fun = partial(format_ref, lists=re_lists)
-    ref = {k: list(map(format_ref_fun, nom[k].unique())) for k in ['event', 'specificities', "notes"]}
-    tot_ref = pd.DataFrame({k: list(map(format_ref_fun, nom[k])) for k in ['event', 'specificities', "notes"]})
-    return ref, tot_ref, nom
 
 
 def format_drop_down_lists(lists):
@@ -81,7 +66,6 @@ def format_tkevt_string(s):
 
 
 def get_nomenclature_ref(fname):
-    """Reads and format the nomenclature."""
     # Read Nomenclature - Sheet 1
     nom = pd.read_excel(fname)
     nom.rename(columns=lambda x: format_str(x), inplace=True)

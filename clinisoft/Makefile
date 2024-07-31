@@ -25,6 +25,6 @@ parse: $(addprefix $(tmp_loc)/, $(all_clin_file_csv_parsed))
 
 # Parsing
 $(tmp_loc)/%_read.csv: $(clin_loc)/%.xlsx
-	$(PYTHON) bin/read_clin.py -i $^ -o $@
+	$(PYTHON) main.py -i $^ -o $@
 	touch $@
 
