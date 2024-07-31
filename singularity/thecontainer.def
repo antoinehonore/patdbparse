@@ -6,6 +6,7 @@ From: debian:12
     apt-get install -y git curl gcc build-essential jq python3-tk python3-pip python3-virtualenv liblapack-dev libblas-dev
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     $HOME/.cargo/bin/cargo build --release --manifest-path /opt/dwc2sig/Cargo.toml
+    mkdir /opt/dwc2sig/bin
     ln -s /opt/dwc2sig/target/release/patdb_bin /opt/dwc2sig/bin/dwc2sig
     
     virtualenv -p python3 /opt/pyenv
@@ -16,6 +17,7 @@ From: debian:12
 %files
     ../dwc2sig /opt/dwc2sig
     /opt/psql/gpg_antoine_pfile.txt /opt/psql/gpg_antoine_pfile.txt
+    /opt/psql/pn_salt.txt /opt/psql/pn_salt.txt
     ../requirements.txt /opt/requirements.txt
 
 

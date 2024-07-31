@@ -12,28 +12,77 @@ import argparse
 from parse import parse
 from functools import partial
 from multiprocessing.dummy import Pool
-from patdbparse.clinisoft.src.utils import format_fname, format_str, append_clinid, pressure_sel
-from patdb_tbox.print.utils import pidprint
-from patdb_tbox.pn.format_pn import init_hash_fun, format_pn
+from utils_tbox.utils_tbox import pidprint
+from utils_db.anonym import init_hash_fun, format_pn
+import unidecode
 
-# Manual curation of data
+
 fix_clin_data = {
-    19335:{"CIRK":{"Vikt": {940: 0.940}}},
-    21083:{"CIRK":{"Vikt": {1545: 1.545}}},
-    20215:{"CIRK":{"Vikt": {0.425: 0.725}}},
-    20633:{"CIRK":{"Vikt": {0.752:np.nan}}},
-    21122:{"CIRK":{"Vikt": {9.44:np.nan}}},
-    21325:{"CIRK":{"Vikt": {18.73: 1.873}}},
-    20035:{"CIRK":{"Vikt": {1.669: np.nan}}},
-    20215:{"CIRK":{"Vikt": {1.4180:np.nan, 0.2671:np.nan, 0.425:np.nan}}},
-    20018:{"CIRK":{"Vikt": {1.497:np.nan}}},
-    20561:{"CIRK":{"Vikt": {4.236:np.nan}}},
-    20024:{"CIRK":{"Vikt": {1.638:np.nan}}},
-    20421:{"CIRK":{"Vikt": {1.016:np.nan}}},
-    20192:{"CIRK":{"Vikt": {1.836:np.nan}}},
-    20032:{"CIRK":{"Vikt": {4.409:np.nan}}},
+    19335:
+        {
+            "CIRK":
+                {"Vikt": {940:0.940}
+                 }
+        },
+    21083:
+        {
+            "CIRK":
+                {"Vikt": {1545:1.545}
+                 }
+        },
+    20215:
+    {
+        "CIRK":
+            {"Vikt": {0.425:0.725}
+             }
+    },
+    20633:
+    {
+        "CIRK":
+            {"Vikt":
+                 {0.752:np.nan}
+             }
+   },
+    21122:
+        {
+                "CIRK":
+                    {"Vikt":
+
+                         {9.44:np.nan}
+                    }
+        },
+    21325:
+        {
+            "CIRK":
+                {"Vikt":
+                     {18.73: 1.873}
+                 }
+        },
 }
 
+
+def pressure_sel(var):
+    """Finds the pressure related variables."""
+    return any([x in var for x in ["pfi", "pmean", "pinsp", "luftv", "peep", "ppeak", "luftv_tr_med",\
+                            "luftv_trp_u_", "hfo_ampl"]]) or var == "cpap"
+
+
+def append_clinid(d, clinid):
+    """Append the integer clinid on the left hand side of dataFrame d with column name 'clinisoftid'."""
+    out = pd.concat(
+        [pd.DataFrame(index=d.index, columns=["clinid"], data=clinid * np.ones((d.shape[0])).astype(int)), d
+         ], axis=1)
+    return out
+
+
+def format_fname(fname_out, thetype):
+    return fname_out.replace(".csv", "_{}.csv".format(thetype))
+
+
+def format_str(s):
+    s_c = ''.join(e if e.isalnum() else '_' for e in s.replace(" ", "__"))
+    out = unidecode.unidecode(s_c).lower()
+    return out
 
 def read_injection(df_, sheet_name="LM_Givet"):
     med_df = df_[sheet_name]
@@ -141,23 +190,20 @@ def find_respirator(d):
         # sometimes several respirator are reported functioning at the same time,
         # This leads to names such as cpaphfo, ...
         # I replace these with the first one.
-        tmp = d[p_var].applymap(lambda s: format_str(str(s))).replace({"":np.nan, "fabian":np.nan, "nan":np.nan}).dropna(how="all").copy()
-        tmp["agg"] = ["/".join(list(map(str,[lll for lll in ll if not (str(lll)=="nan")]))) for ll in tmp.values.tolist()]
-        tmp.drop(columns=p_var,inplace=True)
-        tmp.sort_index(inplace=True)
-        #tmp = d[p_var].fillna("")\
-        #    .applymap(lambda s: format_str(str(s)))\
-        #    .sum(1)\
-        #    .apply(lambda s: s if s!="" else np.nan)\
-        #    .dropna(how="all")\
-        #    .replace(to_replace={"cpapsippv":"cpap", 'nasal__cpapstandby':'nasal__cpap', 'bilevelstandby':"bilevel",
-        #                         'nasal__cpaphfo':'nasal__cpap','nasal__cpapsippv':'nasal__cpap' })
+
+        tmp = d[p_var].fillna("")\
+            .applymap(lambda s: format_str(str(s)))\
+            .sum(1)\
+            .apply(lambda s: s if s!="" else np.nan)\
+            .dropna(how="all")\
+            .replace(to_replace={"cpapsippv":"cpap", 'nasal__cpapstandby':'nasal__cpap', 'bilevelstandby':"bilevel",
+                                 'nasal__cpaphfo':'nasal__cpap','nasal__cpapsippv':'nasal__cpap' })
         # Create a clean DF and remove the duplicated timestamps
         out = pd.DataFrame(columns=["respirator"], data=tmp.values, index=tmp.index)
         out = out[~out.index.duplicated()]
         out = out.reset_index().dropna().set_index('Tid')
         out = out[out["respirator"] != ""]
-        # out = out.resample("10T").bfill(20)
+        out = out.resample("10T").bfill(20)
         out = out.fillna("unknown")
     else:
         # In case of the resp, assume unknown
@@ -177,7 +223,7 @@ def find_temp(d):
         pidprint("Found temp:", p_var)
         tmp = d[p_var].applymap(lambda s: s.strip() if isinstance(s, str) else s).dropna(how="all").groupby(level=0).apply(group_temp)
         out = pd.DataFrame(columns=["cirk_tempaxil"], data=tmp.values, index=tmp.index).dropna(how="all")
-        # out = resample(out)
+        out = resample(out)
 
     else:
         out = pd.DataFrame(columns=["cirk_tempaxil"])
@@ -338,13 +384,12 @@ def gather_lab(dread, fname_out, clinid):
 
     append_clinid(out, clinid).to_csv(format_fname(fname_out, "lab"), sep=";")
 
-def resample(out, _resample=True):
+def resample(out):
     out = out[~out.index.duplicated()]
     out = out.reset_index().dropna().set_index('Tid')
     out = out[out["cirk_vikt"] != ""]
-    if _resample:
-        out = out.resample("3H").mean()
-        out["cirk_vikt"].interpolate("linear", inplace=True)
+    out = out.resample("3H").mean()
+    out["cirk_vikt"].interpolate("linear", inplace=True)
     return out
 
 def gather_vikt(dread, fname_out, clinid):
@@ -353,13 +398,12 @@ def gather_vikt(dread, fname_out, clinid):
         if clinid in fix_clin_data.keys():
             if "CIRK" in fix_clin_data[clinid].keys():
                 if "Vikt" in fix_clin_data[clinid]["CIRK"].keys():
-                    out = out.replace(fix_clin_data[clinid]["CIRK"]["Vikt"]).dropna()
+                    out=out.replace(fix_clin_data[clinid]["CIRK"]["Vikt"]).dropna()
 
         # Catch values written in g rather than kg
         out[out > 200] = out[out > 200] / 1000
 
-        out = resample(out,_resample=False)
-    
+        out = resample(out)
     except:
         out = create_empty(["cirk_vikt"])
 
@@ -368,6 +412,14 @@ def gather_vikt(dread, fname_out, clinid):
 
 def create_empty(columns):
     return pd.DataFrame(columns=["Tid"] + columns).set_index("Tid")
+
+
+parser = argparse.ArgumentParser(description='Read a clinisoft file into csv')
+parser.add_argument('-i', metavar='Input', type=str, nargs=1,
+                    help='Input Clinisoft Excel file.')
+parser.add_argument('-o', metavar='Output', type=str, nargs=1,
+                    help='Out Clinisoft .csv file.')
+args = parser.parse_args()
 
 
 def find_pn(df_):
@@ -385,14 +437,6 @@ def empty_idx():
     return pd.DataFrame(columns=["hpn", "clinid"])
 
 
-
-parser = argparse.ArgumentParser(description='Read a clinisoft file into csv')
-parser.add_argument('-i', metavar='Input', type=str, nargs=1,
-                    help='Input Clinisoft Excel file.')
-parser.add_argument('-o', metavar='Output', type=str, nargs=1,
-                    help='Out Clinisoft .csv file.')
-args = parser.parse_args()
-
 if __name__ == "__main__":
     fname_in = args.i[0]
     fname_out = os.path.abspath(args.o[0])
@@ -404,8 +448,12 @@ if __name__ == "__main__":
 
     if verbose:
         pidprint("Reading", fname_in)
-    sheets_to_load=["RESP","CIRK", "Timkontroll","LAB","LM_Givet", "Vätska_givet"]
-    df = pd.read_excel(fname_in, sheet_name=sheets_to_load, na_values='-', parse_dates=True)
+    try:
+        sheets_to_load=["RESP","CIRK", "Timkontroll","LAB","LM_Givet", "Vätska_givet"]
+        df = pd.read_excel(fname_in, sheet_name=sheets_to_load, na_values='-', parse_dates=True)
+    except:
+        sheets_to_load=["RESP","CIRK","LAB","LM_Givet", "Vätska_givet"]
+        df = pd.read_excel(fname_in, sheet_name=sheets_to_load, na_values='-', parse_dates=True)
     f = init_hash_fun()
 
 
