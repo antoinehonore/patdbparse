@@ -69,7 +69,7 @@ def get_nomenclature_ref(fname):
     # Read Nomenclature - Sheet 1
     nom = pd.read_excel(fname)
     nom.rename(columns=lambda x: format_str(x), inplace=True)
-    nom[['event', 'specificities']] = nom[['event', 'specificities']].fillna(method="ffill")
+    nom[['event', 'specificities']] = nom[['event', 'specificities']].ffill()
     nom[['event', 'specificities', "notes"]] = to_lower(nom[['event', 'specificities', "notes"]])
 
     # Read Nomenclature - Sheet 2
@@ -104,4 +104,4 @@ def to_lower(d):
     """Lower case and strip every string, and all non-strings into strings (nan ->  \"\") """
     d = d.rename(columns=lambda x: x.lower().strip())
     d = d.fillna("")
-    return d.applymap(lambda x: x.lower().strip() if isinstance(x, str) else str(x))
+    return d.map(lambda x: x.lower().strip() if isinstance(x, str) else str(x))

@@ -36,7 +36,7 @@ parse-errors: find-errors
 # The files are processed sequentially to keep the clinIDs in order
 find-errors: init
 	for fname in $(all_files) ; do \
-		$(PYTHON) $(root_dir)/takecare/xlsx2csv_takecare.py -i $$fname -nom $(nom_fname) > /dev/null 2>> $(out_fname) ; \
+		$(PYTHON) $(root_dir)/takecare/main.py -i $$fname -nom $(nom_fname) > /dev/null 2>> $(out_fname) ; \
 	done;
 
 init:

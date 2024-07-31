@@ -59,7 +59,7 @@ def check_vs_nom(ref, data=None):
         # Concatenate individual rows
         not_in_nom = pd.concat(out)
         # Add a keyword to point at error
-        not_in_nom[[ref[0]]] = not_in_nom[[ref[0]]].applymap(lambda x: "? : " + str(x))
+        not_in_nom[[ref[0]]] = not_in_nom[[ref[0]]].map(lambda x: "? : " + str(x))
     else:
         not_in_nom = pd.DataFrame()
     return not_in_nom
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
     # This is used to tolerate and fix common typos
     fspell = partial(check_spelling, spellCheck=lambda x: x)
-    data[['event', 'specificities', "notes"]] = data[['event', 'specificities', "notes"]].applymap(fspell)
+    data[['event', 'specificities', "notes"]] = data[['event', 'specificities', "notes"]].map(fspell)
 
     error_columns = ["dummy", "filename", "patientid", "date", "event", "specificities", "notes", "dummy"]
 

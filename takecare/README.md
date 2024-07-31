@@ -52,17 +52,7 @@ In the nomenclature above, "Type of Microbe" is a keyword for a drop down list.
 |rs-virus|
 
 ## Takecare
-### Parsing a single file (not recommended)
+### Parsing a single file
 ```bash
-$ usage: xlsx2csv_takecare.py [-h] -i filename -nom filename
-
-Parse a takecare rawfile. Writes the error log to stderr and the parsed data
-to stdout
-
-optional arguments:
-  -h, --help     show this help message and exit
-  -i filename    Input raw takecare data file
-  -nom filename  Input ground truth nomenclature file
-
-$ python takecare/xlsx2csv_takecare.xlsx -i env/1000_takecare.xlsx -nom env/Nomenclature.xlsx > tmp/wharf/1000_takecare.csv 2> tmp/wharf/error.log
+singularity exec ../singularity/env.dir/ /opt/pyenv/bin/python main.py -i examples/18454_v2_takecare.xlsx -nom nomenclature/Nomenclature.xlsx
 ```

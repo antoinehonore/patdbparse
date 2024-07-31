@@ -25,7 +25,7 @@ gpg-connect-agent reloadagent /bye
 - Test 
 ```bash
 cd dwc2sig
-singularity exec ../../singularity/env.dir/ /opt/dwc2sig/target/release/patdb_bin --verbose summarize -i examples/data_monitor/pat20 -m LF -o examples/example_output
+singularity exec ../singularity/env.dir/ /opt/dwc2sig/target/release/patdb_bin --verbose summarize -i examples/data_monitor/pat20 -m LF -o examples/example_output
 ```
 
 ## Notes
