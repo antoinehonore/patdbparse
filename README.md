@@ -53,4 +53,4 @@ test.csv: text/plain; charset=utf-8
 You can use the `iconv` tool to convert to `utf-8` if it's not already the case.
 
 3. There are scripts to run the binaries on multiple `pat[id]` folders sequentially.
-Make sure that the data and the binary folder path are configured properly in either the Makefile: `dwc2sig/scripts/update.mk`; or the the shell script: `dwc2sig/scripts/compute-summaries.sh`.
+Make sure that the data and the binary folder path are configured properly in either the Makefile: `dwc2sig/scripts/update.mk`; or the shell script: `dwc2sig/scripts/compute-summaries.sh`.
