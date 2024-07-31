@@ -1,13 +1,14 @@
 # Getting started
 
-- Make sure that apptainer/singularity is installed.
+- Make sure that apptainer/singularity is installed on your host.
 You can find instructions there: ![https://apptainer.org/docs/admin/main/installation.html#installation-on-linux](https://apptainer.org/docs/admin/main/installation.html#installation-on-linux)
 
 
-- Build the container
+- Build the container (You need root access to the host)
 ```bash
 cd singularity
 make build
+make pkg
 ```
 
 - Make sure that the data encryption gpg key is imported on your host
@@ -24,7 +25,7 @@ gpg-connect-agent reloadagent /bye
 - Test 
 ```bash
 cd dwc2sig
-singularity exec ../singularity/env.dir/ /opt/dwc2sig/target/release/patdb_bin --verbose summarize -i examples/data_monitor/pat20 -m LF -o examples/example_output
+singularity exec ../../singularity/env.dir/ /opt/dwc2sig/target/release/patdb_bin --verbose summarize -i examples/data_monitor/pat20 -m LF -o examples/example_output
 ```
 
 ## Notes
