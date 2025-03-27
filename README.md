@@ -1,3 +1,5 @@
+Tools to parse files from different EHR sources.
+
 # Getting started
 
 - Make sure that apptainer/singularity is installed on your host.
